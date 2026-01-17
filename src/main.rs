@@ -1,6 +1,7 @@
-use std::{fs, path::Path};
+use std::path::Path;
 
 use clap::Parser;
+use rls::get_files;
 
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
@@ -26,28 +27,4 @@ fn main() {
     for file in files {
         println!("{}", file);
     }
-}
-
-// Returns a vector containing all located files and directories
-// If files_only is set to true, directories are filtered
-fn get_files(dir: &Path, files_only: bool) -> Vec<String> {
-    let entries = match fs::read_dir(dir) {
-        Ok(entries) => entries,
-        Err(e) => {
-            eprintln!("Error reading directory {:?}: {}", dir, e);
-            return Vec::new();
-        }
-    };
-
-    entries
-        .filter_map(|entry| entry.ok())
-        .filter(|entry| {
-            if files_only {
-                return entry.path().is_file();
-            } else {
-                return true;
-            }
-        })
-        .filter_map(|entry| entry.file_name().into_string().ok())
-        .collect()
 }
