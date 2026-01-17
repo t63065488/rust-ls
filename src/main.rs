@@ -10,20 +10,25 @@ struct Args {
     #[arg(default_value = ".")]
     dir: String,
 
-    /// Number of times to greet
+    /// Recursively list directories
     #[arg(short, long)]
     recursive: bool,
+
+    /// Recursively list directories
+    #[arg(short, long)]
+    files_only: bool,
 }
 
 fn main() {
     let args = Args::parse();
-    dbg!(&args);
-
-    let files = get_files(Path::new(&args.dir));
-    println!("{:?}", files);
+    let files = get_files(Path::new(&args.dir), args.files_only);
+    println!("---- {}", &args.dir);
+    for file in files {
+        println!("{}", file);
+    }
 }
 
-fn get_files(dir: &Path) -> Vec<String> {
+fn get_files(dir: &Path, files_only: bool) -> Vec<String> {
     let entries = match fs::read_dir(dir) {
         Ok(entries) => entries,
         Err(e) => {
@@ -34,6 +39,7 @@ fn get_files(dir: &Path) -> Vec<String> {
     
     entries
         .filter_map(|entry| entry.ok())
+        .filter(|entry| if files_only { return entry.path().is_file() } else { return true })
         .filter_map(|entry| entry.file_name().into_string().ok())
         .collect()
 }
