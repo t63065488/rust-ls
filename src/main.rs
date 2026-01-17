@@ -14,7 +14,7 @@ struct Args {
     #[arg(short, long)]
     recursive: bool,
 
-    /// Recursively list directories
+    /// Whether to ignore directories in print
     #[arg(short, long)]
     files_only: bool,
 }
