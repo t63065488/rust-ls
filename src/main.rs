@@ -22,12 +22,14 @@ struct Args {
 fn main() {
     let args = Args::parse();
     let files = get_files(Path::new(&args.dir), args.files_only);
-    println!("---- {}", &args.dir);
+    println!("#---- {}", &args.dir);
     for file in files {
         println!("{}", file);
     }
 }
 
+// Returns a vector containing all located files and directories
+// If files_only is set to true, directories are filtered
 fn get_files(dir: &Path, files_only: bool) -> Vec<String> {
     let entries = match fs::read_dir(dir) {
         Ok(entries) => entries,
@@ -36,10 +38,16 @@ fn get_files(dir: &Path, files_only: bool) -> Vec<String> {
             return Vec::new();
         }
     };
-    
+
     entries
         .filter_map(|entry| entry.ok())
-        .filter(|entry| if files_only { return entry.path().is_file() } else { return true })
+        .filter(|entry| {
+            if files_only {
+                return entry.path().is_file();
+            } else {
+                return true;
+            }
+        })
         .filter_map(|entry| entry.file_name().into_string().ok())
         .collect()
 }
